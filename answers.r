@@ -30,4 +30,7 @@ cler_sec <- sum(df$jobcat == c('CLERICAL', 'SECURITY OFFICER'))/length(df$jobcat
 sprintf("The percetage of people who are wither clerical workers or security officers is: %05.2f%%", cler_sec*100)
 
 # 6. Run a frequency distribution for “salnow”
-salnow_freq <- table(df$salnow)
+x <- table(df$salnow)
+factorx <-factor(cut(x, breaks=nclass.Sturges(x), dig.lab=5))
+as.matrix(table(factorx))
+hist(x, breaks=nclass.Sturges(x))
