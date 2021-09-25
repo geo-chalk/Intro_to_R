@@ -1,2 +1,2 @@
 # Intr_to_R
-Mini-Project in R
+This is the first project of the course Elements of Statistics and Probability.
