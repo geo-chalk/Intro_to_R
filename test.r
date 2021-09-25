@@ -22,3 +22,7 @@ png("Plots/rplot.png")
 pie(jobcat, col = 2:8)
 legend(0.9, 1, names(jobcat), cex = 0.7, fill = 2:8)
 dev.off()
+
+# 5. report the percentage of people who are either clerical workers or security officers
+cler_sec <- sum(df$jobcat == c('CLERICAL', 'SECURITY OFFICER'))/length(df$jobcat)
+sprintf("The percetage of people who are wither clerical workers or security officers is: %05.2f%%", cler_sec*100)
