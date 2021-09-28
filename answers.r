@@ -35,7 +35,31 @@ sprintf("The percetage of people who are wither clerical workers or security off
 
 # 6. Run a frequency distribution for “salnow”
 frq(df$salnow, title="salary", out = "v", auto.grp = 10)
-x <- table(df$salnow)
-hist(x, breaks=nclass.Sturges(x))
+hist(df$salnow, breaks=nclass.Sturges(df$salnow), xlab = "Salary", main= "Histogram of Salary Now")
 
+# 7. Report the highest salary and how many people make that salary
+max(df$salnow)
+sum(df$salnow == max(df$salnow))
+df[df$salnow == max(df$salnow),]
+
+# 8. Report the mean and median salary
+mean(df$salnow)
+median(df$salnow)
+
+# 9. What is the salary of the 10% highest paid employees in this bank?
+quantile(df$salnow, 0.9)
+
+# 10. Create a histogram of education level (edlevel). Describe the shape of the distribution. 
+# Run descriptives for education level (edlevel). Write a short description/report.
+ed_lvl <- df$edlevel
+png("Plots/10_edlvl.png")
+hist(ed_lvl, breaks=nclass.Sturges(ed_lvl), xlab = "Education Level", main= NULL, ylim = c(0,200))
+dev.off()
+describe(df$edlevel)
+
+
+# 11. Report the mean, standard deviation and range of all quantitative variables.
+nums <- unlist(lapply(df, is.numeric)) 
+nums
+describe(df[ , nums])
 
