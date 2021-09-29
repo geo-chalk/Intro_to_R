@@ -15,9 +15,9 @@ summary(df)
 frq(df$sex, title = "Gender", out = "v")
 sprintf("The total number of men is: %d", sum(df$sex == 'MALES'))
 gender_freq <- table(df$sex)
-png("Plots/2_gender_barplot.png")
+# png("Plots/2_gender_barplot.png")
 barplot(gender_freq, main = "Gender Frequency",col = c(4,2), axes = TRUE, border = TRUE)
-dev.off()
+# dev.off()
 
 # 3. Run a frequency table for "jobcat". 
 # Report the most common job category and its percentage.
@@ -25,14 +25,14 @@ frq(df$jobcat,title = "Job Category", out = "v")
 sprintf("The total number of men is: %d", sum(df$sex == 'MALES'))
 
 # 4. Make a pie chart for "jobcat" 
-png("Plots/rplot.png")
+# png("Plots/rplot.png")
 x <- 100*table(df$jobcat)/length(df$jobcat) 
 pie(x, label=paste( round(x,1), '%', sep='') , col=2:8) 
 legend(0.8, 1, names(jobcat_freq), cex = 0.7, fill = 2:8)
-dev.off()
+# dev.off()
 
 # 5. report the percentage of people who are either clerical workers or security officers
-cler_sec <- sum((df$jobcat == 'CLERICAL')|(df$jobcat == 'SECURITY OFFICER'))/length(df$jobcat)
+cler_sec <- sum((df$jobcat == 'CLERICAL')|(df$jobcat == 'SECURITY OFFICER'))/nrow(df)
 sprintf("The percetage of people who are wither clerical workers or security officers is: %05.2f%%", cler_sec*100)
 
 # 6. Run a frequency distribution for “salnow”
@@ -54,27 +54,85 @@ quantile(df$salnow, 0.9)
 # 10. Create a histogram of education level (edlevel). Describe the shape of the distribution. 
 # Run descriptives for education level (edlevel). Write a short description/report.
 ed_lvl <- df$edlevel
-png("Plots/10_edlvl.png")
+# png("Plots/10_edlvl.png")
 hist(ed_lvl, breaks=nclass.Sturges(ed_lvl), xlab = "Education Level", main= NULL, ylim = c(0,200))
-dev.off()
+# dev.off()
 describe(df$edlevel)
 
 
 # 11. Report the mean, standard deviation and range of all quantitative variables.
 nums <- unlist(lapply(df, is.numeric)) 
 nums
-describe(df[ , nums])
+quan <- df[ , nums][-c(1)]
+describe(quan)
+
+
 
 # 12. Perform a Z-transformation on all quantitative variables. 
 # Report the mean, standard deviation and range of the transformed scores
-qual <- df[ , nums]
-qual
-describe((qual-apply(qual,2,mean))/apply(qual,2,sd))
-cbind(mean(qual),sd(qual))
-colMeans(qual)
+ztran <- function(x, na.rm = TRUE) {
+  mns <- colMeans(x, na.rm = na.rm)
+  sds <- apply(x, 2, sd, na.rm = na.rm)
+  x <- sweep(x, 2, mns, "-")
+  x <- sweep(x, 2, sds, "/")
+  x
+}
+z_quan <- ztran(quan)
+describe(z_quan)[c('mean', 'sd', 'range')]
 
 # 13. Using z-transformed variables, select females only. 
 # What is their average standardized score for education level?
-  ?apply
-  
-  
+mean(cbind(z_quan,df$sex)[,'edlevel'])
+
+# 14. Reselect all cases. Calculate a new variable called “raise” which is the difference 
+# between current salary and beginning salary. Report the mean, median, and standard deviation for “raise”.
+df$raise = df$salnow - df$salbeg
+head(df[c('id', 'salbeg', 'salnow','raise' )])
+describe(df$raise)[c('mean', 'median', 'sd')]
+
+# 15. Which person (report case ID) had the greatest increase in salary from beginning until now? 
+# Report the value of the increase.
+df[df$raise == max(df$raise),]
+
+# 16. If you have many different values for a variable, it may be more meaningful to group scores together. 
+# Recode “salbeg” into a new variable called “salbeg2”.
+describe(df$salbeg)
+mapping <- function(x) {
+  if ((0 <= x) & (x <= 4999)) {
+    f <- 0
+  }
+  else if ((5000 <= x) & (x <= 9999)){
+    f <- 1
+  }
+  else if ((10000 <= x) & (x <= 14999)){
+    f <- 2
+  }
+  else if ((15000 <= x) & (x <= 19999)){
+    f <- 3
+  }
+  else if ((20000 <= x) & (x <= 24999)){
+    f <- 4
+  }
+  else{
+    f <- 5
+  }
+  return(f)
+}
+df$salbeg2 <- lapply(df$salbeg, mapping)
+head(df)
+
+# 17. How many people (and their %) have beginning salaries between $10,000 and $14,999?
+sprintf("There are %d people with salaries between $10,000 and $14,999 corresponding to %05.2f%%"
+        , sum(df$salbeg2 == '2'), sum(df$salbeg2 == '2')/nrow(df)*100)
+
+# 18. Prepare a scatterplot showing the relationship between education level (edlevel) and current salary (salnow). 
+# Put education on the x-axis and current salary on the y-axis.
+plot((df$edlevel-mean(df$edlevel))/sd(df$edlevel), df$salnow, xlab = "Education Level", ylab = "Current Salary")
+
+abline(lm(edlevel~salnow, data = df), lwd=10)
+
+lm(edlevel~salnow, data = df
+
+# 19. How does the relationship between education and current salary appear overall? Linear or non-linear?
+plot(abline(lm(df$edlevel~df$salnow), lwd=10), xlim=c(0,100), ylim=c(0,100))
+# 20. Add the regression line to the graph.
