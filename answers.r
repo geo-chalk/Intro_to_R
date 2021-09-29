@@ -2,6 +2,7 @@ library(foreign)
 library(sjPlot)
 library(sjmisc)
 library(psych)
+library(GeneNet)
 list.files(".")
 
 # 1. Load the data from the SPSS file.
@@ -25,8 +26,9 @@ sprintf("The total number of men is: %d", sum(df$sex == 'MALES'))
 
 # 4. Make a pie chart for "jobcat" 
 png("Plots/rplot.png")
-pie(jobcat_freq, col = 2:8)
-legend(0.7, 1, names(jobcat_freq), cex = 0.7, fill = 2:8)
+x <- 100*table(df$jobcat)/length(df$jobcat) 
+pie(x, label=paste( round(x,1), '%', sep='') , col=2:8) 
+legend(0.8, 1, names(jobcat_freq), cex = 0.7, fill = 2:8)
 dev.off()
 
 # 5. report the percentage of people who are either clerical workers or security officers
@@ -63,3 +65,16 @@ nums <- unlist(lapply(df, is.numeric))
 nums
 describe(df[ , nums])
 
+# 12. Perform a Z-transformation on all quantitative variables. 
+# Report the mean, standard deviation and range of the transformed scores
+qual <- df[ , nums]
+qual
+describe((qual-apply(qual,2,mean))/apply(qual,2,sd))
+cbind(mean(qual),sd(qual))
+colMeans(qual)
+
+# 13. Using z-transformed variables, select females only. 
+# What is their average standardized score for education level?
+  ?apply
+  
+  
